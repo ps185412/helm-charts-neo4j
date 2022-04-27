@@ -1,22 +1,57 @@
-neo4j:
-  resources:
-    cpu: "1"
-    memory: "2Gi"
-
-  # Comment the next line to have a password generated during Helm Chart install.
-  password: "neo4j"
-
-  # Uncomment to use enterprise edition
-  #edition: "enterprise"
-  #acceptLicenseAgreement: "yes"
-  neo4j.acceptLicenseAgreement: "yes"
-
-
-volumes:
-  data:
-    mode: "selector"
-    volume:
-      azureDisk:
-        diskName: "neo4j-disk"
-        diskURI: "/subscriptions/a2713dcb-fff8-418a-acbe-cbee87c15029/resourceGroups/npgs-application-alpha/providers/Microsoft.Compute/disks/neo4j-disk"
-        kind: Managed
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neo4j
+  labels:
+    app: neo4j
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: neo4j
+  template:
+    metadata:
+      labels:
+        app: neo4j
+    spec:
+      containers:
+      - name: neo4j
+        image: neo4j
+        env: 
+          - name: NEO4J_AUTH
+            value: none
+          - name: NEO4J_dbms_security_allow__csv__import__from__file__urls
+            value: true
+          - name: NEO4J_dbms_directories_import
+            value: import
+        volumeMounts:
+          - mountPath: /neo4j/conf
+            name: data2
+          - mountPath: /neo4j/data
+            name: data1
+          - mountPath: /neo4j/import
+            name: data3
+          - mountPath: /neo4j/logs
+            name: data4
+          - mountPath: /neo4j/plugins
+            name: data5
+        ports:
+        - containerPort: 7474
+        - containerPort: 7687
+      restartPolicy: Never
+      volumes:
+      - name: data1
+        hostPath:
+          path: /data
+      - name: data2
+        hostPath:
+          path: /conf
+      - name: data3
+        hostPath:
+          path: /var/lib/neo4j/import
+      - name: data4
+        hostPath:
+          path: /logs
+      - name: data5
+        hostPath:
+          path: /plugins
