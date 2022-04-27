@@ -9,6 +9,7 @@ neo4j:
   # Uncomment to use enterprise edition
   #edition: "enterprise"
   #acceptLicenseAgreement: "yes"
+  neo4j.acceptLicenseAgreement: "yes"
 
 volumes:
   data:
