@@ -11,9 +11,10 @@ neo4j:
   #acceptLicenseAgreement: "yes"
   neo4j.acceptLicenseAgreement: "yes"
 
+
 volumes:
   data:
-    mode: "volume"
+    mode: "selector"
     volume:
       azureDisk:
         diskName: "neo4j-disk"
